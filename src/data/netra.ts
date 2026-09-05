@@ -56,7 +56,7 @@ export const TRACKS: Record<string, Waypoint[]> = {
 };
 
 export const HOURLY = Array.from({ length: 24 }, (_, h) => {
-  const base = [820, 610, 430, 380, 520, 1240, 2680, 4310, 5620, 4890, 3910, 3540, 3720, 3480, 3390, 3860, 4720, 5980, 6240, 5110, 4020, 2870, 1930, 1180][h];
+  const base = [820, 610, 430, 380, 520, 1240, 2680, 4310, 5620, 4890, 3910, 3540, 3720, 3480, 3390, 3860, 4720, 5980, 6240, 5110, 4020, 2870, 1930, 1180][h] ?? 1000;
   return { hour: `${String(h).padStart(2, "0")}:00`, vehicles: base, violations: Math.round(base * 0.031) };
 });
 
