@@ -13,10 +13,10 @@ import {
 import { CAMERAS, cameraById, type Waypoint } from "@/data/netra";
 
 export type LeafletMapProps = {
-  route?: Waypoint[];
-  activeOrder?: number;
-  onWaypointClick?: (order: number) => void;
-  heat?: boolean;
+  route?: Waypoint[] | undefined;
+  activeOrder?: number | undefined;
+  onWaypointClick?: ((order: number) => void) | undefined;
+  heat?: boolean | undefined;
 };
 
 function FitBounds({ points }: { points: [number, number][] }) {
