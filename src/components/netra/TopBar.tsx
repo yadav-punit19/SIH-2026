@@ -1,13 +1,27 @@
-import { Bell, Camera, Radio } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { Bell, Camera, LogOut, Radio } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CAMERAS, WATCHLIST } from "@/data/netra";
+import { supabase } from "@/integrations/supabase/client";
 
 export function TopBar({ alertCount, onToggleAlerts, alertsOpen }: { alertCount: number; onToggleAlerts: () => void; alertsOpen: boolean }) {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-panel/90 backdrop-blur">
@@ -34,28 +48,39 @@ export function TopBar({ alertCount, onToggleAlerts, alertsOpen }: { alertCount:
             <span>{WATCHLIST.length} flagged plates</span>
           </div>
           <p className="font-mono text-sm tabular-nums text-foreground">
-            {now.toLocaleTimeString("en-IN", { hour12: false })}{" "}
+            {now ? now.toLocaleTimeString("en-IN", { hour12: false }) : "--:--:--"}{" "}
             <span className="text-xs text-muted-foreground">IST</span>
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onToggleAlerts}
-          aria-label="Toggle alert stream"
-          className={`relative grid size-9 place-items-center rounded-lg border transition-colors ${
-            alertsOpen
-              ? "border-alert/60 bg-alert/15 text-alert"
-              : "border-border bg-panel-elevated text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Bell className="size-4" />
-          {alertCount > 0 && (
-            <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-alert font-mono text-[10px] font-bold text-white">
-              {alertCount}
-            </span>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleAlerts}
+            aria-label="Toggle alert stream"
+            className={`relative grid size-9 place-items-center rounded-lg border transition-colors ${
+              alertsOpen
+                ? "border-alert/60 bg-alert/15 text-alert"
+                : "border-border bg-panel-elevated text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Bell className="size-4" />
+            {alertCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-alert font-mono text-[10px] font-bold text-white">
+                {alertCount}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+            title="Sign out"
+            className="grid size-9 place-items-center rounded-lg border border-border bg-panel-elevated text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <LogOut className="size-4" />
+          </button>
+        </div>
       </div>
     </header>
   );
