@@ -56,7 +56,9 @@ function Index() {
   useEffect(() => {
     if (!live) return;
     const t = setInterval(() => {
-      setEvents((prev) => [makeEvent(nextId.current++), ...prev].slice(0, 40));
+      const e = makeEvent(nextId.current++);
+      if (e.flagged) setSeen(false);
+      setEvents((prev) => [e, ...prev].slice(0, 40));
     }, 2800);
     return () => clearInterval(t);
   }, [live]);
