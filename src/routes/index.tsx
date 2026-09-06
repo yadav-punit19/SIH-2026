@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Activity, ScanLine, ShieldAlert } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnalyticsTab } from "@/components/netra/AnalyticsTab";
 import { TopBar } from "@/components/netra/TopBar";
 import { TrajectoryTab } from "@/components/netra/TrajectoryTab";
-import { WatchlistTab } from "@/components/netra/WatchlistTab";
+import { WatchlistTab, makeEvent, type StreamEvent } from "@/components/netra/WatchlistTab";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,7 +71,7 @@ function Index() {
         onToggleAlerts={() => {
           setAlertsOpen(true);
           setTab("watchlist");
-          setAlertCount(0);
+          setSeen(true);
         }}
       />
 
@@ -98,7 +98,9 @@ function Index() {
       <main className="p-4 lg:p-6">
         {tab === "trajectory" && <TrajectoryTab />}
         {tab === "analytics" && <AnalyticsTab />}
-        {tab === "watchlist" && <WatchlistTab />}
+        {tab === "watchlist" && (
+          <WatchlistTab events={events} live={live} onToggleLive={() => setLive((v) => !v)} />
+        )}
       </main>
     </div>
   );
