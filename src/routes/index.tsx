@@ -45,8 +45,23 @@ type TabId = (typeof TABS)[number]["id"];
 
 function Index() {
   const [tab, setTab] = useState<TabId>("trajectory");
-  const [alertCount, setAlertCount] = useState(3);
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [live, setLive] = useState(true);
+  const [events, setEvents] = useState<StreamEvent[]>(() =>
+    Array.from({ length: 8 }, (_, i) => makeEvent(i + 1)),
+  );
+  const nextId = useRef(9);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    if (!live) return;
+    const t = setInterval(() => {
+      setEvents((prev) => [makeEvent(nextId.current++), ...prev].slice(0, 40));
+    }, 2800);
+    return () => clearInterval(t);
+  }, [live]);
+
+  const alertCount = seen ? 0 : events.filter((e) => e.flagged).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
