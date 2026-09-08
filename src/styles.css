@@ -154,6 +154,10 @@
   background: oklch(0.17 0.018 258);
   font-family: inherit;
 }
+/* Dark-theme rendering of standard OSM tiles */
+.netra-dark-tiles {
+  filter: invert(0.92) hue-rotate(185deg) brightness(0.86) contrast(0.95) saturate(0.55);
+}
 .leaflet-control-attribution,
 .leaflet-bar a {
   background: var(--panel) !important;
