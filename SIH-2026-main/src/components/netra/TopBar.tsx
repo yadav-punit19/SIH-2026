@@ -111,6 +111,13 @@ export function TopBar({
           {/* Logout / Switch Operator Button */}
           <Link
             to="/login"
+            onClick={() => {
+              try {
+                localStorage.removeItem("netra_operator");
+              } catch {
+                /* ignore */
+              }
+            }}
             aria-label="Operator login screen"
             title="Switch Operator / Logout"
             className="grid size-9 place-items-center rounded-lg border border-border bg-panel-elevated text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
