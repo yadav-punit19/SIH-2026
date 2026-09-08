@@ -56,8 +56,9 @@ export default function LeafletMap({
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
-        attribution="&copy; OpenStreetMap &copy; CARTO"
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        attribution="&copy; OpenStreetMap contributors"
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        className="netra-dark-tiles"
       />
       <FitBounds points={fitPoints} />
 
