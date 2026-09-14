@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Activity, Camera, ScanLine, ShieldAlert } from "lucide-react";
+import { Activity, Camera, ScanLine, ShieldAlert, TrendingUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnalyticsTab } from "@/components/netra/AnalyticsTab";
 import { AnprTab } from "@/components/netra/AnprTab";
+import { CongestionTab } from "@/components/netra/CongestionTab";
 import { TopBar } from "@/components/netra/TopBar";
 import { TrajectoryTab } from "@/components/netra/TrajectoryTab";
 import { WatchlistTab, makeEvent, type StreamEvent } from "@/components/netra/WatchlistTab";
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/")({
       {
         rel: "icon",
         type: "image/svg+xml",
-        href: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/svg%3E",
+        href: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/svg%3E",
       },
     ],
   }),
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/")({
 
 const TABS = [
   { id: "trajectory", label: "Trajectory Search", icon: ScanLine },
+  { id: "congestion", label: "Congestion Management", icon: TrendingUp },
   { id: "recognition", label: "Plate Recognition", icon: Camera },
   { id: "analytics", label: "Traffic Analytics", icon: Activity },
   { id: "watchlist", label: "Blacklist Watchlist", icon: ShieldAlert },
@@ -101,6 +103,7 @@ function Index() {
 
       <main className="p-4 lg:p-6">
         {tab === "trajectory" && <TrajectoryTab />}
+        {tab === "congestion" && <CongestionTab />}
         {tab === "recognition" && <AnprTab />}
         {tab === "analytics" && <AnalyticsTab />}
         {tab === "watchlist" && (

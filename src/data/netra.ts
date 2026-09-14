@@ -198,3 +198,70 @@ export const RANDOM_PLATES = [
 export function cameraById(id: string) {
   return CAMERAS.find((c) => c.id === id)!;
 }
+
+export type CongestionPrediction = {
+  cameraId: string;
+  cameraName: string;
+  sector: string;
+  currentCongestion: number; // 0-1
+  predictedCongestion: number; // 0-1
+  congestionDelta: number; // e.g. +0.12 or -0.05
+  predictedThroughput: number;
+  riskLevel: "low" | "moderate" | "critical";
+  trend: "rising" | "stable" | "easing";
+  advisory: string;
+};
+
+export function predictCongestionForCamera(cam: Camera, minutesAhead: number): CongestionPrediction {
+  const seed = (cam.id.charCodeAt(4) || 1) + minutesAhead;
+  const timeFactor = (minutesAhead / 60) * 0.14;
+  const surgeWobble = Math.sin(seed * 0.8) * 0.11 + Math.cos(seed * 0.45) * 0.07;
+  
+  const rawPredicted = cam.congestion + timeFactor * 0.6 + surgeWobble;
+  const predictedCongestion = Math.max(0.18, Math.min(0.98, Number(rawPredicted.toFixed(2))));
+  const congestionDelta = Number((predictedCongestion - cam.congestion).toFixed(2));
+  
+  const riskLevel: "low" | "moderate" | "critical" =
+    predictedCongestion >= 0.75 ? "critical" : predictedCongestion >= 0.5 ? "moderate" : "low";
+
+  const trend: "rising" | "stable" | "easing" =
+    congestionDelta > 0.03 ? "rising" : congestionDelta < -0.03 ? "easing" : "stable";
+
+  const throughputFactor = 1 - (predictedCongestion - 0.5) * 0.35;
+  const predictedThroughput = Math.round(cam.throughput * Math.max(0.45, Math.min(1.25, throughputFactor)));
+
+  let advisory = "Traffic flow operating within normal seasonal parameters.";
+  if (riskLevel === "critical") {
+    advisory = `Critical gridlock risk at ${cam.name}. Extend green light signal +20s and activate Barapullah / Ring Rd diversion.`;
+  } else if (riskLevel === "moderate") {
+    advisory = `Moderate congestion buildup detected. Monitor ${cam.sector} sector arterial corridors.`;
+  }
+
+  return {
+    cameraId: cam.id,
+    cameraName: cam.name,
+    sector: cam.sector,
+    currentCongestion: cam.congestion,
+    predictedCongestion,
+    congestionDelta,
+    predictedThroughput,
+    riskLevel,
+    trend,
+    advisory,
+  };
+}
+
+export function getNodeCongestionAlerts(cameras: Camera[] = CAMERAS, threshold = 0.75) {
+  return cameras
+    .filter((c) => c.congestion >= threshold)
+    .map((c) => ({
+      id: `ALERT-CONG-${c.id}`,
+      cameraId: c.id,
+      cameraName: c.name,
+      sector: c.sector,
+      congestion: c.congestion,
+      throughput: c.throughput,
+      timestamp: new Date().toISOString(),
+    }));
+}
+
